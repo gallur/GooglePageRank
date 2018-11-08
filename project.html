@@ -5,4 +5,56 @@ layout: default
 
 ### When Google first came up with the algorithm to rank web pages based on certain criterion like number of backlinks a website gets from other reknowed websites, they knew that this was a big data problem. Me, personally being extremely interested in search engine optimization algorithms, was intrigued to take on a project emulating the same.
 
-### This algorithm makes use of the fact that you can land on a page in one of only two ways - either you access the webpage directly or you access it using some link on another page.
+### This algorithm makes use of the fact that you can land on a page in one of only two ways - either you access the webpage directly or you access it using some link on another page. The pagerank of a page is shared between the pages that it links to.
+### Based on prior tests, a person would land directly on a page about 15% of the time but 85% of time, they would come from a different link.
+
+### The mapper for the algo takes input in the form of <Site, PR, Neighbors> and yields Site, Neighbors.
+  
+```
+class MR_program(MRJob):
+
+    def mapper(self, _, line):
+
+        node, pr, *nbrs = line.split()
+        for x in nbrs:
+            yield(x,float(pr)/len(nbrs))
+        yield node, nbrs
+```
+
+  ### We use a multi step reducer in this project as we need to calculate PR for neighbors as well as their neighbors.
+  
+  ```
+  def reducer(self, key, values):  # values is a generator
+        # yield key, f(values)
+        lst = list(values)
+        acc = 0.0
+        nbrs =[]
+        for x in lst:
+            if type(x) == float:
+                acc += x
+            else:
+                nbrs = x
+        pr  = (1-0.85)/4 + 0.85*acc
+        for z in nbrs:
+            yield z, pr/len(nbrs)
+        yield key,nbrs
+  ```
+  
+  ### The last step or the final reducer puts it all together and gives us the final output of the PR values for each page.
+  
+  ```
+   def reducer2(self, key, values):  # values is a generator
+            # yield key, f(values)
+            lst = list(values)
+            acc = 0.0
+            nbrs =[]
+            for x in lst:
+                if type(x) == float:
+                    acc += x
+                else:
+                    nbrs = x
+            pr  = (1-0.85)/4 + 0.85*acc
+            yield key, pr
+  ```
+  
+  ### MRStep was used to put together the different steps in the algorithm.
