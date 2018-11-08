@@ -11,7 +11,7 @@ layout: default
 
 ### The mapper for the algo takes input in the form of <Site, PR, Neighbors> and yields Site, Neighbors.
   
-```
+```python
 class MR_program(MRJob):
 
     def mapper(self, _, line):
@@ -24,7 +24,7 @@ class MR_program(MRJob):
 
   ### We use a multi step reducer in this project as we need to calculate PR for neighbors as well as their neighbors.
   
-  ```
+  ```python
   def reducer(self, key, values):  # values is a generator
         # yield key, f(values)
         lst = list(values)
@@ -43,7 +43,7 @@ class MR_program(MRJob):
   
   ### The last step or the final reducer puts it all together and gives us the final output of the PR values for each page.
   
-  ```
+  ```python
    def reducer2(self, key, values):  # values is a generator
             # yield key, f(values)
             lst = list(values)
