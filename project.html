@@ -40,6 +40,20 @@ layout: default
         <span style="color: #008800; font-weight: bold">yield</span> key,nbrs
 </pre></div>
 
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #008800; font-weight: bold">def</span> <span style="color: #0066BB; font-weight: bold">reducer2</span>(<span style="color: #007020">self</span>, key, values):  <span style="color: #888888"># values is a generator</span>
+            <span style="color: #888888"># yield key, f(values)</span>
+            lst <span style="color: #333333">=</span> <span style="color: #007020">list</span>(values)
+            acc <span style="color: #333333">=</span> <span style="color: #6600EE; font-weight: bold">0.0</span>
+            nbrs <span style="color: #333333">=</span>[]
+            <span style="color: #008800; font-weight: bold">for</span> x <span style="color: #000000; font-weight: bold">in</span> lst:
+                <span style="color: #008800; font-weight: bold">if</span> <span style="color: #007020">type</span>(x) <span style="color: #333333">==</span> <span style="color: #007020">float</span>:
+                    acc <span style="color: #333333">+=</span> x
+                <span style="color: #008800; font-weight: bold">else</span>:
+                    nbrs <span style="color: #333333">=</span> x
+            pr  <span style="color: #333333">=</span> (<span style="color: #0000DD; font-weight: bold">1</span><span style="color: #333333">-</span><span style="color: #6600EE; font-weight: bold">0.85</span>)<span style="color: #333333">/</span><span style="color: #0000DD; font-weight: bold">4</span> <span style="color: #333333">+</span> <span style="color: #6600EE; font-weight: bold">0.85</span><span style="color: #333333">*</span>acc
+            <span style="color: #008800; font-weight: bold">yield</span> key, pr
+</pre></div>
+
 <h3> Ultimately, I used an MRStep to define the steps of the algorithm and how MapReduce should follow. </h3>
 
 
