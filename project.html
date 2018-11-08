@@ -12,16 +12,35 @@ layout: default
 
  The mapper for the algo takes input in the form of (Site, PR, Neighbors) and yields Site, Neighbors. </h3> 
 
-```
-class MR_program(MRJob):
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #008800; font-weight: bold">class</span> <span style="color: #BB0066; font-weight: bold">MR_program</span>(MRJob):
 
-    def mapper(self, _, line):
+    <span style="color: #008800; font-weight: bold">def</span> <span style="color: #0066BB; font-weight: bold">mapper</span>(<span style="color: #007020">self</span>, _, line):
 
-        node, pr, *nbrs = line.split()
-        for x in nbrs:
-            yield(x,float(pr)/len(nbrs))
-        yield node, nbrs
-```
+        node, pr, <span style="color: #333333">*</span>nbrs <span style="color: #333333">=</span> line<span style="color: #333333">.</span>split()
+        <span style="color: #008800; font-weight: bold">for</span> x <span style="color: #000000; font-weight: bold">in</span> nbrs:
+            <span style="color: #008800; font-weight: bold">yield</span>(x,<span style="color: #007020">float</span>(pr)<span style="color: #333333">/</span><span style="color: #007020">len</span>(nbrs))
+        <span style="color: #008800; font-weight: bold">yield</span> node, nbrs
+</pre></div>
+
+<h3> The reducer works to find the pagerank of the nieghbors of neighbors too. I used two reducers so that at one stage I can calculate the PR of neighbors and then in the other stage extend to its nieghbors too.</h3>
+
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"> <span style="color: #008800; font-weight: bold">def</span> <span style="color: #0066BB; font-weight: bold">reducer</span>(<span style="color: #007020">self</span>, key, values):  <span style="color: #888888"># values is a generator</span>
+        <span style="color: #888888"># yield key, f(values)</span>
+        lst <span style="color: #333333">=</span> <span style="color: #007020">list</span>(values)
+        acc <span style="color: #333333">=</span> <span style="color: #6600EE; font-weight: bold">0.0</span>
+        nbrs <span style="color: #333333">=</span>[]
+        <span style="color: #008800; font-weight: bold">for</span> x <span style="color: #000000; font-weight: bold">in</span> lst:
+            <span style="color: #008800; font-weight: bold">if</span> <span style="color: #007020">type</span>(x) <span style="color: #333333">==</span> <span style="color: #007020">float</span>:
+                acc <span style="color: #333333">+=</span> x
+            <span style="color: #008800; font-weight: bold">else</span>:
+                nbrs <span style="color: #333333">=</span> x
+        pr  <span style="color: #333333">=</span> (<span style="color: #0000DD; font-weight: bold">1</span><span style="color: #333333">-</span><span style="color: #6600EE; font-weight: bold">0.85</span>)<span style="color: #333333">/</span><span style="color: #0000DD; font-weight: bold">4</span> <span style="color: #333333">+</span> <span style="color: #6600EE; font-weight: bold">0.85</span><span style="color: #333333">*</span>acc
+        <span style="color: #008800; font-weight: bold">for</span> z <span style="color: #000000; font-weight: bold">in</span> nbrs:
+            <span style="color: #008800; font-weight: bold">yield</span> z, pr<span style="color: #333333">/</span><span style="color: #007020">len</span>(nbrs)
+        <span style="color: #008800; font-weight: bold">yield</span> key,nbrs
+</pre></div>
+
+<h3> Ultimately, I used an MRStep to define the steps of the algorithm and how MapReduce should follow. </h3>
 
 
   
